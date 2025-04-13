@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--codice con tag meta utile per PWA-->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--titolo-->
+    <title>Home</title>
+    <!--script per attivare ionic-->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <!-- Meta Tags required for
+       Progressive Web App -->
+    <meta name=
+    "apple-mobile-web-app-status-bar"
+          content="#aa7700">
+    <meta name="theme-color"
+          content="black">
+  
+    <!-- Manifest File link -->
+    <link rel="manifest"
+          href="manifest.json">
+
+    <!--richiamo sw.js per far funzionare la pwa offline-->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/serviceworker.js')
+        .then(function(registration) {
+          console.log('Registration successful, scope is:', registration.scope);
+        })
+        .catch(function(error) {
+          console.log('Service worker registration failed, error:', error);
+        });
+      }
+      </script>
+
+    <!-- Style -->
+    <style>
+      :root {
+        --ion-safe-area-top: 20px;
+        --ion-safe-area-bottom: 22px;
+      }
+
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      input[type="submit"] {
+        width: 100%;
+        background-color: #4caf50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+
+      div {
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+      }
+
+      .alert {
+        padding: 20px;
+        background-color: #f44336;
+        color: white;
+      }
+
+      .closebtn {
+        margin-left: 15px;
+        color: white;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .closebtn:hover {
+        color: black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <ion-app>
+      <div class="ion-page" id="main-content">
+        <ion-header></ion-header>
+        <ion-content class="ion-padding">
+          <!-- ALERT -->
+          <div class="alert">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <strong>Attenzione!</strong> Se vuoi trovare altri intertempi, premi il pulsante reset.
+          </div>
+
+          <!-- FORM -->
+          <div>
+            <h2>Programma per calcolare gli intertempi</h2><br />
+            <form action="/action_page.php" name="form1">
+              <label for="fname">Metri</label>
+              <input type="text" id="fname" name="metri" placeholder="Inserisci metri totali.." />
+
+              <label for="lname">Secondi</label>
+              <input type="text" id="lname" name="secondi" placeholder="In quanti secondi ogni 100?" />
+
+              <!-- NUOVI INPUT -->
+              <label for="minPerKm">Minuti al km</label>
+              <input type="text" id="minPerKm" placeholder="Inserisci i minuti per km.." />
+
+              <label for="secPerKm">Secondi al km</label>
+              <input type="text" id="secPerKm" placeholder="Inserisci i secondi per km.." />
+
+              <!-- RISULTATO 100M -->
+              <p id="output100m" style="font-weight: bold; margin-top: 10px;"></p>
+
+              <!-- OUTPUT PARZIALI -->
+              <p id="demo"></p>
+
+              <!-- BOTTONI -->
+              <ion-button expand="block" color="success" onclick="stampa()">Invia</ion-button>
+              <ion-button expand="block" color="danger" onclick="reset()">Reset</ion-button>
+              <ion-button expand="block" color="medium" onclick="calcola100m()">Calcola 100m da passo/km</ion-button>
+            </form>
+          </div>
+        </ion-content>
+      </div>
+    </ion-app>
+
+    <!-- SCRIPT PARZIALI -->
+    <script>
+      var metri, secondi, metri2, tempo, x;
+      var y;
+      var cont = 1;
+      function stampa() {
+        metri = document.form1.metri.value;
+        secondi = document.form1.secondi.value;
+        metri2 = metri / 100;
+        let text = "";
+        for (; cont <= metri2; ) {
+          tempo = secondi * cont;
+          x = tempo % 60;
+          let min = Math.floor(tempo / 60);
+          tempo = min + "' " + x.toFixed(0) + '"';
+          cont++;
+          y = 100 * cont - 100;
+          text += "Al " + y + " passaggio in " + tempo + "<br>";
+        }
+        document.getElementById("demo").innerHTML = text;
+      }
+    </script>
+
+    <!-- SCRIPT RESET -->
+    <script>
+      function reset() {
+        document.form1.metri.value = "";
+        document.form1.secondi.value = "";
+        document.getElementById("minPerKm").value = "";
+        document.getElementById("secPerKm").value = "";
+        document.getElementById("output100m").innerHTML = "";
+        cont = 1;
+        document.getElementById("demo").innerHTML = "";
+      }
+    </script>
+
+    <!-- SCRIPT CALCOLO 100M -->
+    <script>
+      function calcola100m() {
+        const min = parseInt(document.getElementById("minPerKm").value) || 0;
+        const sec = parseInt(document.getElementById("secPerKm").value) || 0;
+
+        const totalSecPerKm = min * 60 + sec;
+        const secPer100m = totalSecPerKm / 10;
+
+        document.getElementById("output100m").innerText =
+          "Ogni 100 metri devi correre in " + secPer100m.toFixed(1) + " secondi.";
+      }
+    </script>
+
+    <!-- MENU IONIC -->
+    <script>
+      async function openMenu() {
+        await menuController.open();
+      }
+    </script>
+
+                <!--script per il service worker-->
+                <script>
+                  window.addEventListener('load', () => {
+                  registerSW();
+                  });
+                
+                  // Register the Service Worker
+                  async function registerSW() {
+                  if ('serviceWorker' in navigator) {
+                    try {
+                    await navigator
+                        .serviceWorker
+                        .register('serviceworker.js');
+                    }
+                    catch (e) {
+                    console.log('SW registration failed');
+                    }
+                  }
+                  }
+                </script>
+  </body>
+</html>
